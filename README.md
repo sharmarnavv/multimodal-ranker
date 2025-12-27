@@ -30,3 +30,6 @@ uv run uvicorn src.api:app --reload
 1. **hardware**: cpu optimized (c6i.xlarge) is fine. gpu overkill for now.
 2. **ram**: need 4gb min. clip eats ram.
 3. **env**: `QDRANT_URL`, `QDRANT_API_KEY`.
+
+### future expansion
+- **redis**: for async job queue (celery/bullmq). needed if handling massive bulk ingests or video processing. currently disabled.

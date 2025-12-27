@@ -1,7 +1,9 @@
 version: '3.8'
 services:
-  # Redis is still needed for the job queue (Phase 2)
-  redis:
-    image: redis:alpine
+  # vector database (optional, if not using cloud)
+  qdrant:
+    image: qdrant/qdrant:latest
     ports:
-      - "6379:6379"
+      - "6333:6333"
+    volumes:
+      - ./qdrant_data:/qdrant/storage
