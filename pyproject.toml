@@ -1,0 +1,18 @@
+[project]
+name = "multimodal-ranker"
+version = "0.1.0"
+description = "This generates a rank for images and text"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.128.0",
+    "numpy>=2.4.0",
+    "pillow>=12.0.0",
+    "python-dotenv>=1.2.1",
+    "python-multipart>=0.0.21",
+    "qdrant-client>=1.16.2",
+    "torch>=2.9.1",
+    "torchvision>=0.24.1",
+    "transformers>=4.57.3",
+    "uvicorn>=0.40.0",
+]
