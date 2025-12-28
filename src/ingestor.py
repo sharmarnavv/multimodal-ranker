@@ -1,61 +1,43 @@
 import uuid
 from qdrant_client.http import models
 from src.db import get_client, COLLECTION_NAME
-from src.embedders import VisualEngine
+from src.embedders import VibeEngine
 
-# load engine once
-engine = VisualEngine()
+engine = VibeEngine()
 client = get_client()
 
-def ingest_creative(user_data, image_path):
-    """
-    user_data: dict
-    image_path: str
-    """
+def ingest_creative(user_data, image_path=None, audio_path=None):
     print(f"Processing {user_data.get('name')}...")
     
-    # 1. vectorize image
-    vector = engine.get_image_vector(image_path)
+    # Dictionary to hold whichever vectors we generate
+    vectors_to_store = {}
     
-    if not vector:
-        print(f"⚠️ Skipping {user_data['name']} - Image not found or invalid.")
+    # 1. Process Visual
+    if image_path:
+        vis_vec = engine.get_image_vector(image_path)
+        if vis_vec:
+            vectors_to_store["visual"] = vis_vec
+            
+    # 2. Process Audio
+    if audio_path:
+        aud_vec = engine.get_audio_vector(audio_path)
+        if aud_vec:
+            vectors_to_store["audio"] = aud_vec
+            
+    if not vectors_to_store:
+        print("⚠️ Skipping: No valid image or audio provided.")
         return
 
-    # 2. prepare payload 
-    payload = user_data
+    # 3. Upload with Named Vectors
     point_id = str(uuid.uuid4())
-
-    # 3. upload to qdrant   
     client.upsert(
         collection_name=COLLECTION_NAME,
         points=[
             models.PointStruct(
                 id=point_id,
-                vector=vector, # standard list[float]
-                payload=payload
+                vector=vectors_to_store, # Pass dict {'visual': [...], 'audio': [...]}
+                payload=user_data
             )
         ]
     )
     print(f"✅ Indexed {user_data['name']} (ID: {point_id})")
-
-if __name__ == "__main__":
-    ingest_creative(
-        user_data={
-            "name": "Sarah J", 
-            "role": "Model", 
-            "height": 175, 
-            "location": "London",
-            "tags": ["grunge", "streetwear"]
-        },
-        image_path="test.jpg"
-    )
-    
-    ingest_creative(
-        user_data={
-            "name": "Mike Ross", 
-            "role": "Actor", 
-            "union": "SAG", 
-            "location": "NYC"
-        },
-        image_path="test.jpg" 
-    )

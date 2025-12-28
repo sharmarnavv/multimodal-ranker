@@ -23,10 +23,10 @@ def init_db():
         # standard single vector config
         client.create_collection(
             collection_name=COLLECTION_NAME,
-            vectors_config=models.VectorParams(
-                size=512, 
-                distance=models.Distance.COSINE
-            )
+            vectors_config={
+                "visual": models.VectorParams(size=512, distance=models.Distance.COSINE),
+                "audio": models.VectorParams(size=512, distance=models.Distance.COSINE),
+            }
         )
         print("✅ Schema initialized.")
     else:
